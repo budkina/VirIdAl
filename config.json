@@ -1,0 +1,15 @@
+{
+    "forward": "",
+    "reverse" : "",
+    "ref_names":[],
+    "identity" : 0.9,
+    "average_qual" : 20,
+    "min_len" : 36,
+    "virus_search_s1_evalue_n" : 1e-3,
+    "virus_search_s1_evalue_2" : 1e-3,
+    "virus_search_s2_evalue_n" : 1e-10,
+    "virus_search_s2_evalue_p" : 1e-10,
+    "additional_search_evalue_n": 1e-10,
+    "additional_search_evalue_p": 1e-10,
+    "num_threads" : 1
+}
