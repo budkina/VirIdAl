@@ -32,6 +32,7 @@ def parse_command_line():
         '\tvirus_search: Search for virus sequences, always performed\n'+
         '\tadditional_search: Search for sequences that were not identified at virus_search step\n'+
         '\tall: Perform all steps',
+        nargs='+',
         default=['qc', 'merging', 'filter', 'cluster', 'virus_search'])
 
     # Output files commands
