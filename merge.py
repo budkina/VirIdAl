@@ -4,14 +4,14 @@ import sys
 class Merge:
     """Merge class"""
     def __init__(self,
-        temp,
+        filename_gen,
         threads):
-        self.temp = temp
+        self.filename_gen = filename_gen
         self.threads = threads
 
     def do_merge(self, fastq_files):
         """Merge overlapped paired-end reads"""
-        merged = self.temp.compose_filename('merged',True)
+        merged = self.filename_gen.compose_filename('merged',True)
         fastp_json = self.filename_gen.compose_filename('fastp.merging.json')
         fastp_html = self.filename_gen.compose_filename('fastp.merging.html')
         if call(f'fastp --merge --merged_out {merged} --thread {self.threads} -j {fastp_json} -h {fastp_html} --in1 {fastq_files[0]} --in2 {fastq_files[1]}', shell=True)!=0:
