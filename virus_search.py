@@ -52,7 +52,7 @@ class VirusSearch:
         self.virus_found_fasta = self.filename_gen.compose_filename("virusdb.found.fasta",True)
         self.virus_notfound_fasta = self.filename_gen.compose_filename("virusdb.notfound.fasta",True)
         self.virus_search_notfound_fasta = self.filename_gen.compose_filename('virus_search.notfound.fasta')
-        self.unknown_search_input_fasta = self.filename_gen.compose_filename('unknown_search_input.fasta',True)
+        self.additional_search_input_fasta = self.filename_gen.compose_filename('additional_search_input.fasta',True)
 
     def do_search(self):
         # BLAST + Diamond search in virus database
@@ -63,7 +63,7 @@ class VirusSearch:
             self.process_potential_viruses()
         else:
             print(colored("Nothing was found in virus database","green"))
-            return self.unknown_search_input_fasta
+            return self.additional_search_input_fasta
 
         # combine sequnces that were not found
         if not os.path.isfile(self.virus_notfound_fasta) or os.path.getsize(self.virus_notfound_fasta) == 0:
@@ -72,10 +72,10 @@ class VirusSearch:
         if call('cat ' +
             self.virus_search_notfound_fasta + ' ' +
             self.virus_notfound_fasta + ' '
-            ' > ' + self.unknown_search_input_fasta, shell=True)!=0:
+            ' > ' + self.additional_search_input_fasta, shell=True)!=0:
             sys.exit("Failed to cat files")
 
-        return self.unknown_search_input_fasta
+        return self.additional_search_input_fasta
 
     def filter_virus_db(self):
         """Filter out sequences that were not found in virus database"""

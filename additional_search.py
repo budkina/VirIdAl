@@ -36,7 +36,7 @@ class AdditionalSearch:
         self.additional_search_notfound = self.filename_gen.compose_filename('additional_search.notfound.csv')
 
         # fasta files names
-        self.additional_search_search_input_fasta = self.filename_gen.compose_filename('notvirus_search_input.fasta',True)
+        self.additional_search_search_input_fasta = self.filename_gen.compose_filename('additional_search_input.fasta',True)
         self.additional_search_notfound_fasta = self.filename_gen.compose_filename('additional_search.notfound.fasta')
 
     def do_search(self):
