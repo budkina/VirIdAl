@@ -16,7 +16,7 @@ class Report:
         notfound_report,
         notfound_fasta,
         threads,
-        append_to_existing = False):
+        append_to_existing):
         self.filename_gen = filename_gen
         self.original_fasta = original_fasta
         self.nt_report = nt_report
@@ -59,11 +59,10 @@ class Report:
         viruses = self.merged.loc[(self.merged['nt_sskingdom'] == 'Viruses') | (self.merged['nr_sskingdom'] == 'Viruses')]
 
         if self.append_to_existing:
-            viruses.to_csv(self.virus_report, mode='a', header=True, index=True, sep='\t')
+            viruses.to_csv(self.virus_report, mode='a', header=False, index=True, sep='\t')
         else:
             viruses.to_csv(self.virus_report, header=True, index=True, sep='\t')
 
-        viruses.to_csv(self.virus_report, header=True, index=True, sep='\t')
         print(colored(f"Virus hits are in {self.virus_report}","green"))
 
     def get_notfound(self):

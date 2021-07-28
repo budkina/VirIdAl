@@ -131,7 +131,8 @@ class VirusSearch:
             self.viruses_res,
             self.virus_search_notfound,
             self.virus_search_notfound_fasta,
-            self.threads)
+            self.threads,
+            False)
 
         report.generate_reports()
 
