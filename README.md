@@ -100,8 +100,9 @@ Intermediate and temporary files are cleaned up by default. This can be changed 
 ```
 usage: main.py [-h] [--unpaired UNPAIRED] [--forward FORWARD]
                [--reverse REVERSE] [--input_dir INPUT_DIR] [--load_config]
-               [--config CONFIG] [--steps STEPS] [--output_dir OUTPUT_DIR]
-               [--num_threads NUM_THREADS] [--keep_temp] [--adapters ADAPTERS]
+               [--config CONFIG] [--steps STEPS [STEPS ...]]
+               [--output_dir OUTPUT_DIR] [--num_threads NUM_THREADS]
+               [--keep_temp] [--save_unmerged] [--adapters ADAPTERS]
                [--average_qual AVERAGE_QUAL] [--min_len MIN_LEN]
                [--complexity_threshold COMPLEXITY_THRESHOLD] [--cut_front]
                [--cut_tail] [--cut_right] [--cut_window_size CUT_WINDOW_SIZE]
@@ -129,7 +130,8 @@ General:
                         Path to input folder, default: "/input/" for docker image
   --load_config         Use JSON file for configuration (overwrites command line parameters)
   --config CONFIG       JSON config file path, default: "/input/config.json" for docker image
-  --steps STEPS         Set of steps to perform in analysis (default: merging qc filter cluster virus_search):
+  --steps STEPS [STEPS ...]
+                        Set of steps to perform in analysis (default: merging qc filter cluster virus_search):
                         	merging: Paired-end reads merging using fastp, always performed
                         	qc: Quality filtering using fastp
                         	filter: Filter fastq by mapping reads on the reference genomes using bowtie2
@@ -142,6 +144,9 @@ General:
   --num_threads NUM_THREADS
                         Number of threads
   --keep_temp           Keep temporary files in output folder, default: false
+
+Merging (fastp):
+  --save_unmerged       Save unmerged reads for processing, default disabled
 
 Quality control (fastp):
   --adapters ADAPTERS   Path to the file with the adapter sequences for fastp, default: /input/adapters.fa for docker image
@@ -187,6 +192,7 @@ Search:
   --prot_db_name PROT_DB_NAME
                         Protein database with various sequences for search, default: nr_diamond
   --db_dir DB_DIR       Full path to database folder, default: "/database/" for docker image
+
   ```
   
 ## Download and build databases manually
