@@ -1,7 +1,7 @@
 import os
 import sys
+import logging
 from subprocess import call
-from termcolor import colored
 import qc
 import merge
 import filtering
@@ -14,10 +14,10 @@ from visualization import virus_pie_charts_report
 
 def validate_fastq(fastq):
     """Check fastq validity"""
-    print(colored(f"Checking {fastq} validity","green"))
-
+    logging.info(f"Checking {fastq} validity")
     if call(f'fastq_info {fastq}', shell=True)!=0:
-        sys.exit(f"Fastq file {fastq} is invalid")
+        logging.error(f"Fastq file {fastq} is invalid")
+        sys.exit()
 
 ######### MAIN #########
 
@@ -31,18 +31,32 @@ if __name__ == "__main__":
         if not os.path.isdir(args[d]):
             sys.exit(f" {d} folder: {args[d]} does not exist")
 
+    # Initialize base_filename
+    base_filename = ""
+    if args['unpaired']:
+        base_filename = os.path.basename(args['unpaired'])
+    elif args['forward'] and args['reverse']:
+        base_filename = os.path.basename(args['forward'])
+    else:
+        sys.exit("Input fastq files are not defined")
+
+    # Initialize logging
+    log_file = logging.FileHandler(os.path.join(args['output_dir'], f"{base_filename}.log"))
+    log_console = logging.StreamHandler()
+    logging.basicConfig(level=logging.INFO,
+        format="%(levelname)s:%(message)s",
+        handlers=[log_file, log_console])
+
     # Check input files
     fastq_files = []
     paired_end = False
-    base_filename = ""
 
     # if single-end
     if args['unpaired']:
         fastq_unpaired = os.path.join(args['input_dir'],args['unpaired'])
         validate_fastq(fastq_unpaired)
         fastq_files.append(fastq_unpaired)
-        base_filename = os.path.basename(args['unpaired'])
-
+        
     # if paired-end
     elif args['forward'] and args['reverse']:
         paired_end = True
@@ -52,9 +66,9 @@ if __name__ == "__main__":
         fastq_files.append(fastq_forward)
         validate_fastq(fastq_reverse)
         fastq_files.append(fastq_reverse)
-        base_filename = os.path.basename(args['forward'])
     else:
-        sys.exit("Input fastq files are not defined")
+        logging.error("Input fastq files are not defined")
+        sys.exit()
 
     # Create temp files class
     filename_gen = temp_files.TempFiles(base_filename)
@@ -64,6 +78,7 @@ if __name__ == "__main__":
 
     # Merge paired-end files
     if paired_end:
+        logging.info("Merging paired-end files")
         merge_step = merge.Merge(filename_gen,
             args['num_threads'])
 
@@ -73,6 +88,7 @@ if __name__ == "__main__":
 
     # Quality control step
     if 'qc' in args['steps'] or 'all' in args['steps']:
+        logging.info("Quality control")
         qc_step = qc.QC(filename_gen,
             args['adapters'],
             args['average_qual'],
@@ -89,6 +105,7 @@ if __name__ == "__main__":
 
     # Filter step
     if 'filter' in args['steps'] or 'all' in args['steps']:
+        logging.info("Filtering")
         filter_step = filtering.Filter(filename_gen,
             args['db_dir'],
             args['ref_names'],
@@ -100,9 +117,11 @@ if __name__ == "__main__":
     fasta = filename_gen.compose_filename("fasta", True)
 
     if call(f"sed -n '1~4s/^@/>/p;2~4p' {fastq}  > {fasta}", shell=True)!=0:
-        sys.exit("Failed to convert to fasta")
+        logging.error(f"Failed to convert to fasta")
+        sys.exit()
 
     if 'cluster' in args['steps'] or 'all' in args['steps']:
+        logging.info("Clustering")
         cluster_step = clustering.Cluster(filename_gen,
             args['identity'],
             args['num_threads'])
@@ -111,12 +130,13 @@ if __name__ == "__main__":
 
     # Set blast database folder environment variable
     if not os.path.isdir(args['db_dir']):
-        sys.exit(f"Folder {args['db_dir']} does not exist")
+        logging.error(f"Folder {args['db_dir']} does not exist")
+        sys.exit()
 
     os.environ['BLASTDB'] = args['db_dir']
 
-
     # Search for virus sequences
+    logging.info("Virus search step")
     search = virus_search.VirusSearch(filename_gen,
         fasta,
         args['virus_search_s1_evalue_n'],
@@ -134,6 +154,7 @@ if __name__ == "__main__":
 
     # Process unidentified sequences
     if 'additional_search' in args['steps'] or 'all' in args['steps']:
+        logging.info("Additional_search search step")
         search = additional_search.AdditionalSearch(
             filename_gen,
             notfound,

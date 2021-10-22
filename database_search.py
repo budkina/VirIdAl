@@ -1,7 +1,7 @@
 import sys
 import subprocess
 from collections import namedtuple
-from termcolor import colored
+import logging
 
 SearchFile = namedtuple("SearchFile", "database report fields fasta evalue")
 
@@ -24,7 +24,7 @@ class DatabaseSearch:
         processes = []
 
         # blastn or megablast search
-        print(colored(f"blastn search, database:{self.search_file_nt.database} file:{self.search_file_nt.fasta}","green"))
+        logging.info(f"blastn search, database:{self.search_file_nt.database} file:{self.search_file_nt.fasta}")
 
         blastn_process = subprocess.Popen(f"blastn -db {self.search_file_nt.database} " +
             f" -outfmt '6 delim=\t {self.search_file_nt.fields}' "+
@@ -37,7 +37,7 @@ class DatabaseSearch:
         processes.append(blastn_process)
 
         # diamond blastx search
-        print(colored(f"diamond blastx search, database: {self.search_file_nr.database} file: {self.search_file_nr.fasta}","green"))
+        logging.info(f"diamond blastx search, database: {self.search_file_nr.database} file: {self.search_file_nr.fasta}")
 
         if self.diamond_mode == "sensitive":
             diamond_process = subprocess.Popen(f"diamond blastx --sensitive --db {self.search_file_nr.database}" +
@@ -59,5 +59,6 @@ class DatabaseSearch:
         for process in processes:
             returncode = process.wait()
             if returncode!=0:
-                sys.exit(f"search failed {process.args}")
+                logging.error(f"search failed {process.args}")
+                sys.exit()
                 

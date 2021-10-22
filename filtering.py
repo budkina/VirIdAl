@@ -1,7 +1,7 @@
 from subprocess import call
 import os
 import sys
-from termcolor import colored
+import logging
 
 class Filter:
     """Filter fastq by aligning to reference genomes"""
@@ -18,18 +18,20 @@ class Filter:
     def do_filter(self, fastq):
         """Filter reads by aligning on a set of reference genomes"""
         if not os.path.isdir(self.ref_dir):
-            sys.exit(f"Folder {self.ref_dir} does not exist")
+            logging.error(f"Folder {self.ref_dir} does not exist")
+            sys.exit()
 
         if not self.ref_names:
-            print("Reference genome names are not defined!")
+            logging.info("Reference genome names are not defined!")
             return fastq
 
         for ref_name in self.ref_names:
-            print(colored(f"Mapping to {ref_name}","green"))
+            logging.info(f"Mapping to {ref_name}")
             reference = os.path.join(self.ref_dir, ref_name)
             sam=self.filename_gen.compose_filename('sam', True)
             unaligned_fastq=self.filename_gen.compose_filename(ref_name + '.unaligned', True)
             if call(f'bowtie2 --un {unaligned_fastq} -p {self.threads} -x {reference} -U {fastq} -S {sam}', shell=True)!=0:
-                sys.exit("Genome mapping failed")
+                logging.error("Genome mapping failed")
+                sys.exit()
 
         return unaligned_fastq

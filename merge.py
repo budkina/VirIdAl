@@ -1,5 +1,6 @@
 from subprocess import call
 import sys
+import logging
 
 class Merge:
     """Merge class"""
@@ -19,6 +20,7 @@ class Merge:
             merge_command += f' --include_unmerged'
 
         if call(merge_command, shell=True)!=0:
-            sys.exit("fastp merge paired-end files failed")
-
+            logging.error("fastp merge paired-end files failed")
+            sys.exit()
+            
         return merged

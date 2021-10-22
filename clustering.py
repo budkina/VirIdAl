@@ -1,7 +1,7 @@
 from subprocess import call
 import os
 import sys
-from termcolor import colored
+import logging
 
 class Cluster:
     """FASTA file clusterization"""
@@ -16,14 +16,17 @@ class Cluster:
 
     def do_cluster(self, fasta):
         """Cluster input fasta file"""
-        print(colored("Clustering with vsearch","green"))
+        logging.info("Clustering with vsearch")
         clustered_filename = self.filename_gen.compose_filename('clustered.fasta',True)
 
         if call(f"""vsearch --cluster_fast {fasta} --threads {self.threads} \
             --id {self.identity} --centroids {clustered_filename}""", shell=True)!=0:
-            sys.exit("Clustering with vsearch failed")
+            logging.error("Clustering with vsearch failed")
+            sys.exit()
 
         if not os.path.isfile(clustered_filename):
-            sys.exit("Clustered file does not exist")
+            logging.error("Clustered file does not exist")
+            sys.exit()
+            
         return clustered_filename
 

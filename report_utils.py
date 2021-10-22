@@ -2,7 +2,7 @@ import os
 import sys
 from subprocess import call
 import pandas as pd
-from termcolor import colored
+import logging
 
 class Report:
 
@@ -53,7 +53,7 @@ class Report:
 
         self.merged = pd.concat([nt_hits,nr_hits], axis=1)
         self.merged.to_csv(self.result_report, header=True, index=True, sep='\t')
-        print(colored(f"nt/nr search report is in {self.result_report}","green"))
+        logging.info(f"nt/nr search report is in {self.result_report}")
 
     def extract_virus_reports(self):
         viruses = self.merged.loc[(self.merged['nt_sskingdom'] == 'Viruses') | (self.merged['nr_sskingdom'] == 'Viruses')]
@@ -63,13 +63,14 @@ class Report:
         else:
             viruses.to_csv(self.virus_report, header=True, index=True, sep='\t')
 
-        print(colored(f"Virus hits are in {self.virus_report}","green"))
+        logging.info(f"Virus hits are in {self.virus_report}")
 
     def get_notfound(self):
         # Get sequence id list for fasta file
         all_entries_list = self.filename_gen.compose_filename("all_entries.list", True)
         if call(f'grep ">" {self.original_fasta}  | cut -c2- > {all_entries_list}', shell=True)!=0:
-            sys.exit("Failed to grep IDs from " + self.original_fasta)
+            logging.error("Failed to grep IDs from " + self.original_fasta)
+            sys.exit()
 
         # Save all sequences that were not found
         all_entries=pd.read_csv(all_entries_list,header=None)
@@ -79,6 +80,7 @@ class Report:
 
         if os.path.getsize(self.notfound_report) != 0:
             if call(f'seqkit grep -j {self.threads} -f {self.notfound_report} {self.original_fasta} > {self.notfound_fasta}', shell=True)!=0:
-                sys.exit(f"Seqkit -f {self.notfound_report} {self.original_fasta} > {self.notfound_fasta} grep failed")
+                logging.error(f"Seqkit -f {self.notfound_report} {self.original_fasta} > {self.notfound_fasta} grep failed")
+                sys.exit()
 
-            print(colored(f"not found entries are in {self.notfound_report} and {self.notfound_fasta}","green"))
+            logging.info(f"not found entries are in {self.notfound_report} and {self.notfound_fasta}")

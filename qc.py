@@ -1,6 +1,7 @@
 from subprocess import call
 import sys
 import os
+import logging
 
 class QC:
     """Quality control class"""
@@ -57,7 +58,8 @@ class QC:
             trim_command += f' --cut_right --cut_mean_quality {self.cut_mean_quality}  --cut_window_size {self.cut_window_size}'
 
         if call(trim_command, shell=True)!=0:
-            sys.exit("Trim failed")
+            logging.error("Trim failed")
+            sys.exit()
 
         self.fastq = trimmed
         

@@ -1,8 +1,8 @@
 from subprocess import call
 import os
 import sys
+import logging
 from collections import namedtuple
-from termcolor import colored
 import report_utils
 import database_search
 
@@ -62,18 +62,20 @@ class VirusSearch:
         if os.path.isfile(self.virus_found_fasta) and os.path.getsize(self.virus_found_fasta) > 0:
             self.process_potential_viruses()
         else:
-            print(colored("Nothing was found in virus database","green"))
+            logging.info("Nothing was found in virus database")
             return self.additional_search_input_fasta
 
         # combine sequnces that were not found
         if not os.path.isfile(self.virus_notfound_fasta) or os.path.getsize(self.virus_notfound_fasta) == 0:
-            sys.exit("All sequences were found in potential virus search")
+            logging.error("All sequences were found in potential virus search")
+            sys.exit()
 
         if call('cat ' +
             self.virus_search_notfound_fasta + ' ' +
             self.virus_notfound_fasta + ' '
             ' > ' + self.additional_search_input_fasta, shell=True)!=0:
-            sys.exit("Failed to cat files")
+            logging.error("Failed to cat files")
+            sys.exit()
 
         return self.additional_search_input_fasta
 
@@ -81,22 +83,26 @@ class VirusSearch:
         """Filter out sequences that were not found in virus database"""
 
         # Blast and diamond search in virus database
-        print(colored("Searching in virus db","green"))
+        logging.info("Searching in virus db")
         self.virus_search()
 
         # Split fasta file into found and notfound in virus database parts
         if os.path.getsize(self.virus_search_s1_found) != 0:
             if call(f'seqkit grep -j {self.threads} -f {self.virus_search_s1_found} {self.input_fasta} > {self.virus_found_fasta}', shell=True)!=0:
-                sys.exit("Seqkit grep known failed")
+                logging.error("Seqkit grep known failed")
+                sys.exit()
 
             if call(f'seqkit grep -j {self.threads} -v -f {self.virus_search_s1_found} {self.input_fasta} > {self.virus_notfound_fasta}', shell=True)!=0:
-                sys.exit("Seqkit grep unknown failed")
+                logging.error("Seqkit grep unknown failed")
+                sys.exit()
         else:
             if call(f'cp {self.input_fasta} {self.virus_notfound_fasta}', shell=True)!=0:
-                sys.exit("Copy file failed")
+                logging.error("Copy file failed")
+                sys.exit()
 
             if call(f'touch {self.virus_found_fasta}', shell=True)!=0:
-                sys.exit("Create empty file failed")
+                logging.error("Create empty file failed")
+                sys.exit()
 
     def process_potential_viruses(self):
         """BLAST + Diamond search in nt/nr database of sequences identified as viruses on the previous step"""
@@ -136,7 +142,7 @@ class VirusSearch:
 
         report.generate_reports()
 
-        print(colored("Potential virus sequences processing complete","green"))
+        logging.info("Potential virus sequences processing complete")
 
     def virus_search(self):
         """Search sequences in virus databases"""
@@ -162,4 +168,5 @@ class VirusSearch:
         search_obj.search()
 
         if call(f'cat {self.virus_search_report_s1_nt} {self.virus_search_report_s1_nr} > {self.virus_search_s1_found}', shell=True)!=0:
-            sys.exit("Failed to cat virus reports")
+            logging.error("Failed to cat virus reports")
+            sys.exit()
