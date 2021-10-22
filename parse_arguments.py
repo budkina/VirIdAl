@@ -48,6 +48,12 @@ def parse_command_line():
         help='Keep temporary files in output folder, default: false',
         action='store_true')
 
+    # Merging commands
+    merge_group = parser.add_argument_group('Merging (fastp)')
+    merge_group.add_argument('--save_unmerged',
+        help="Save unmerged reads for processing, default disabled",
+        action='store_true')
+    
     # Quality control commands
     qc_group = parser.add_argument_group('Quality control (fastp)')
     qc_group.add_argument('--adapters',

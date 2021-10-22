@@ -67,7 +67,7 @@ if __name__ == "__main__":
         merge_step = merge.Merge(filename_gen,
             args['num_threads'])
 
-        fastq = merge_step.do_merge(fastq_files)
+        fastq = merge_step.do_merge(fastq_files, args['save_unmerged'])
     else:
         fastq = fastq_files[0]
 
