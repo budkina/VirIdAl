@@ -1,6 +1,6 @@
 # VirIdAl
 
-VirIdAl is a pipeline for the identification of virus sequences in NGS data. It allows you to perform a qualitative analysis on a metagenomic sample and extract a list of virus sequences and sequences from an unidentified source for further research.
+VirIdAl is a pipeline for identifying viral sequences in NGS data. It allows a qualitative analysis of a metagenomic sample and extraction of a list of viral sequences and sequences from an unidentified source for further investigation.
 
 ## Workflow
 
@@ -8,10 +8,9 @@ VirIdAl workflow consists of the validation, quality trimming, filtering, cluste
 
 ![Alt text](search.png?raw=true "Title")
 
-The virus search stage is used to identify known viral sequences precisely. It is divided into two steps: first, the input sequences are searched in nucleotide and protein virus databases, and then the sequences detected are aligned to nt and nr databases. A high search sensitivity in the first step allows you to pick sequences similar to viral and reduce the number of sequences aligned to the nt and nr bases in the next step, increasing the search speed significantly.
+The virus search step is used to accurately identify known viral sequences. It consists of two steps: first, the input sequences are searched in nucleotide and protein viral databases, and then the detected sequences are aligned with the nt and nr databases. The high sensitivity of the search in the first step allows us to select virus-like sequences and reduce the number of sequences aligned with the nt and nr databases in the next step, which greatly increases the search speed.
 
-On the additional search stage, the sequences that were filtered on the virus search stage can be rescanned.
-It enables you to obtain sequences from unknown sources that were not assigned to any organism during the previous stages of the search and identify additional viral sequences that were filtered out during the virus search stage. 
+In an additional search step, sequences that were filtered out in the virus search step can be re-scanned. This allows sequences from unknown sources that were not assigned to any organism in the previous search steps to be retrieved and additional viral sequences that were filtered out in the virus search step to be identified.
 
 ## Getting Started
 The script depends entirely on the packages available from conda. It is recommended to run it in a Docker container.
