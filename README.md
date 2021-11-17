@@ -100,6 +100,7 @@ python docker_run.py --name viridal --input  /path/to/input/directory --output /
 - filename.additional_search.csv - BLAST and Diamond results on sequences that were scanned on additional search stage
 - filename.additional_search.notfound.csv - sequences that were not identified on the additional search stage
 - filename.additional_search.notfound.fasta - fasta file with sequences that were not identified on the additional search stage
+- filename.log - log file
 
 Intermediate and temporary files are cleaned up by default. This can be changed by specifying --keep_temp option.
 
