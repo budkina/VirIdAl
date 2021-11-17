@@ -49,9 +49,18 @@ docker run -v /path/to/input/directory:/input \
 -v /path/to/output/directory:/output \
 -v /path/to/database/directory:/database \
 viridal python main.py --num_threads 4 --ref_names GRCh38 --unpaired fastq_file
+```
+
+for paired-end files:
 
 ```
-The same command can be launched from docker_run.py script:
+docker run -v /path/to/input/directory:/input \
+-v /path/to/output/directory:/output \
+-v /path/to/database/directory:/database \
+viridal python main.py --num_threads 4 --ref_names GRCh38 --save_unmerged --forward fastq_file1 --reverse fastq_file2
+```
+
+The same commands can be launched from docker_run.py script:
 
 ```
 python docker_run.py --name viridal --input /path/to/input/directory --output /path/to/output/directory --database /path/to/database/directory --command "python main.py --num_threads 4 --ref_names GRCh38 --unpaired fastq_file"
