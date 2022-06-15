@@ -31,6 +31,7 @@ def parse_command_line():
         '\tcluster: Fasta file clusterization using vsearch\n'+
         '\tvirus_search: Search for virus sequences, always performed\n'+
         '\tadditional_search: Search for sequences that were not identified at virus_search step\n'+
+        '\run_nn_test: Run Deepac-vir (doi.org/10.1093/nargab/lqab004) and ViraMiner (doi:10.1371/journal.pone.0222271) prediction for unidentified sequences\n'+
         '\tall: Perform all steps',
         nargs='+',
         default=['qc', 'merging', 'filter', 'cluster', 'virus_search'])
@@ -50,8 +51,8 @@ def parse_command_line():
 
     # Merging commands
     merge_group = parser.add_argument_group('Merging (fastp)')
-    merge_group.add_argument('--save_unmerged',
-        help="Save unmerged reads for processing, default disabled",
+    merge_group.add_argument('--do_not_save_unmerged',
+        help="Do not save unmerged reads for processing, default: disabled",
         action='store_true')
     
     # Quality control commands
@@ -115,6 +116,9 @@ def parse_command_line():
     search_group.add_argument('--additional_search_evalue_p',
         help='Diamond evalue threshold for additional search stage, default = 1e-10',
         default="1e-10")
+    search_group.add_argument('--max_target_seqs',
+        help=' Number of database sequences to show alignments for blastn and diamond, default = 25',
+        default="10")
     search_group.add_argument('--virus_nucl_db_name',
         default='virus_nucl',
         help='Nucleotide database with virus sequences, default: virus_nucl')
@@ -130,6 +134,12 @@ def parse_command_line():
     search_group.add_argument('--db_dir',
         help='Full path to database folder, default: "/database/" for docker image',
         default='/database/')
+    
+    # DeePaC-vir and ViraMiner test commands
+    nn_group = parser.add_argument_group('DeePaC-vir and ViraMiner tests')
+    nn_group.add_argument('--deepac_model',
+        help='DeePaC-vir model: CNN or LSTM, default = LSTM',
+        default="LSTM")
 
     return parser.parse_args()
 

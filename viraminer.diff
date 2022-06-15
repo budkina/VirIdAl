@@ -1,0 +1,13 @@
+diff --git a/predict_only.py b/predict_only.py
+index 308ea0c..29af6e9 100644
+--- a/predict_only.py
++++ b/predict_only.py
+@@ -74,7 +74,7 @@ pred_probas = pred_probas[:test_set_size,:]
+ print "cropped the repetitions away, leaving", np.shape(pred_probas)
+ preds = pred_probas>0.5
+ 
+-print "TEST ROC area under the curve \n", roc_auc_score(test_labels, pred_probas)
++#print "TEST ROC area under the curve \n", roc_auc_score(test_labels, pred_probas)
+ np.savetxt(model_name+"_TEST_predictions.txt",pred_probas,fmt="%.5f")
+ np.savetxt(model_name+"_TEST_lables.txt",test_labels,fmt="%d")
+ 

@@ -3,7 +3,7 @@ import subprocess
 from collections import namedtuple
 import logging
 
-SearchFile = namedtuple("SearchFile", "database report fields fasta evalue")
+SearchFile = namedtuple("SearchFile", "database report fields fasta evalue max_target_seqs")
 
 class DatabaseSearch:
     """blastn/megablast/diamond search class"""
@@ -32,6 +32,7 @@ class DatabaseSearch:
             f" -out {self.search_file_nt.report} "+
             f" -query {self.search_file_nt.fasta} "+
             f" -evalue {self.search_file_nt.evalue} "+
+            f" -max_target_seqs {self.search_file_nt.max_target_seqs} "+
             f" -task {self.blastn_mode}", shell=True)
 
         processes.append(blastn_process)
@@ -45,6 +46,7 @@ class DatabaseSearch:
                 f" --threads {self.threads}" +
                 f" --out {self.search_file_nr.report}" +
                 f" --query {self.search_file_nr.fasta}" +
+                f" --max-target-seqs {self.search_file_nr.max_target_seqs} "+
                 f" --evalue {self.search_file_nr.evalue}", shell=True)
         else:
             diamond_process = subprocess.Popen(f"diamond blastx --db {self.search_file_nr.database}" +
@@ -52,6 +54,7 @@ class DatabaseSearch:
                 f" --threads {self.threads}" +
                 f" --out {self.search_file_nr.report}" +
                 f" --query {self.search_file_nr.fasta}" +
+                f" --max-target-seqs {self.search_file_nr.max_target_seqs} "+
                 f" --evalue {self.search_file_nr.evalue}", shell=True)
 
         processes.append(diamond_process)

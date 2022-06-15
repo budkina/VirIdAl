@@ -11,6 +11,7 @@ import additional_search
 import temp_files
 from parse_arguments import get_arguments
 from visualization import virus_pie_charts_report
+from nn_test import run_deepac, run_viraminer
 
 def validate_fastq(fastq):
     """Check fastq validity"""
@@ -82,7 +83,7 @@ if __name__ == "__main__":
         merge_step = merge.Merge(filename_gen,
             args['num_threads'])
 
-        fastq = merge_step.do_merge(fastq_files, args['save_unmerged'])
+        fastq = merge_step.do_merge(fastq_files, args['do_not_save_unmerged'])
     else:
         fastq = fastq_files[0]
 
@@ -143,6 +144,7 @@ if __name__ == "__main__":
         args['virus_search_s1_evalue_p'],
         args['virus_search_s2_evalue_n'],
         args['virus_search_s2_evalue_p'],
+        args['max_target_seqs'],
         args['db_dir'],
         args['virus_nucl_db_name'],
         args['virus_prot_db_name'],
@@ -160,16 +162,28 @@ if __name__ == "__main__":
             notfound,
             args['additional_search_evalue_n'],
             args['additional_search_evalue_p'],
+            args['max_target_seqs'],
             args['db_dir'],
             args['nucl_db_name'],
             args['prot_db_name'],
             args['num_threads'])
 
-        search.do_search()
+        notfound = search.do_search()
 
     # Create html report for found viruses
     if os.path.isfile(search.viruses_res) and os.path.getsize(search.viruses_res) > 0:
         virus_pie_charts_report(filename_gen, search.viruses_res)
+    
+    if 'run_nn_test' in args['steps'] or 'all' in args['steps']:
+        logging.info("DeePaC-vir test step")
+        deepac_input = notfound
+        deepac_output = filename_gen.compose_filename("deepac_result", False)
+        run_deepac(deepac_input, deepac_output, args['deepac_model'])
+        logging.info("ViraMiner test step")
+        viraminer_input = notfound
+        viraminer_output = filename_gen.compose_filename("viraminer_result", False)
+        run_viraminer(viraminer_input, viraminer_output)
+
 
     # Delete temporary files
     if not args['keep_temp']:

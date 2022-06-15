@@ -6,7 +6,7 @@ from collections import namedtuple
 import report_utils
 import database_search
 
-SearchFile = namedtuple("SearchFile", "database report fields fasta evalue")
+SearchFile = namedtuple("SearchFile", "database report fields fasta evalue max_target_seqs")
 
 class VirusSearch:
     def __init__(self,
@@ -16,6 +16,7 @@ class VirusSearch:
         virus_search_s1_evalue_p,
         virus_search_s2_evalue_n,
         virus_search_s2_evalue_p,
+        max_target_seqs,
         database_directory,
         virus_nucl_db_name,
         virus_prot_db_name,
@@ -29,6 +30,7 @@ class VirusSearch:
         self.virus_search_s1_evalue_p=virus_search_s1_evalue_p
         self.virus_search_s2_evalue_n=virus_search_s2_evalue_n
         self.virus_search_s2_evalue_p=virus_search_s2_evalue_p
+        self.max_target_seqs = max_target_seqs
         self.database_directory=database_directory
         self.virus_nucl_db_name = virus_nucl_db_name
         self.virus_prot_db_name = virus_prot_db_name
@@ -111,13 +113,15 @@ class VirusSearch:
             report = self.virus_search_report_s2_nt,
             fields = "qaccver saccver sskingdom ssciname salltitles pident evalue",
             fasta = self.virus_found_fasta,
-            evalue = self.virus_search_s2_evalue_n)
+            evalue = self.virus_search_s2_evalue_n,
+            max_target_seqs = self.max_target_seqs)
 
         search_file_diamond = SearchFile(database = os.path.join(self.database_directory,self.prot_db_name),
             report = self.virus_search_report_s2_nr,
             fields = "qseqid sseqid sskingdoms sscinames salltitles pident evalue",
             fasta = self.virus_found_fasta,
-            evalue = self.virus_search_s2_evalue_p)
+            evalue = self.virus_search_s2_evalue_p,
+            max_target_seqs = self.max_target_seqs)
 
         search_obj = database_search.DatabaseSearch(search_file_blastn,
             search_file_diamond,
@@ -151,13 +155,15 @@ class VirusSearch:
             report = self.virus_search_report_s1_nt,
             fields = "qseqid",
             fasta = self.input_fasta,
-            evalue = self.virus_search_s1_evalue_n)
+            evalue = self.virus_search_s1_evalue_n,
+            max_target_seqs = self.max_target_seqs)
 
         search_file_diamond = SearchFile(database = os.path.join(self.database_directory,self.virus_prot_db_name),
             report = self.virus_search_report_s1_nr,
             fields = "qseqid",
             fasta = self.input_fasta,
-            evalue = self.virus_search_s1_evalue_p)
+            evalue = self.virus_search_s1_evalue_p,
+            max_target_seqs = self.max_target_seqs)
 
         search_obj = database_search.DatabaseSearch(search_file_blastn,
             search_file_diamond,
