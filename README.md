@@ -57,7 +57,7 @@ for paired-end files:
 docker run -v /path/to/input/directory:/input \
 -v /path/to/output/directory:/output \
 -v /path/to/database/directory:/database \
-viridal python main.py --num_threads 4 --ref_names GRCh38 --save_unmerged --forward fastq_file1 --reverse fastq_file2
+viridal python main.py --num_threads 4 --ref_names GRCh38 --forward fastq_file1 --reverse fastq_file2
 ```
 
 The same commands can be launched from docker_run.py script:
@@ -113,7 +113,7 @@ usage: main.py [-h] [--unpaired UNPAIRED] [--forward FORWARD]
                [--reverse REVERSE] [--input_dir INPUT_DIR] [--load_config]
                [--config CONFIG] [--steps STEPS [STEPS ...]]
                [--output_dir OUTPUT_DIR] [--num_threads NUM_THREADS]
-               [--keep_temp] [--save_unmerged] [--adapters ADAPTERS]
+               [--keep_temp] [--do_not_save_unmerged] [--adapters ADAPTERS]
                [--average_qual AVERAGE_QUAL] [--min_len MIN_LEN]
                [--complexity_threshold COMPLEXITY_THRESHOLD] [--cut_front]
                [--cut_tail] [--cut_right] [--cut_window_size CUT_WINDOW_SIZE]
@@ -125,10 +125,11 @@ usage: main.py [-h] [--unpaired UNPAIRED] [--forward FORWARD]
                [--virus_search_s2_evalue_p VIRUS_SEARCH_S2_EVALUE_P]
                [--additional_search_evalue_n ADDITIONAL_SEARCH_EVALUE_N]
                [--additional_search_evalue_p ADDITIONAL_SEARCH_EVALUE_P]
+               [--max_target_seqs MAX_TARGET_SEQS]
                [--virus_nucl_db_name VIRUS_NUCL_DB_NAME]
                [--virus_prot_db_name VIRUS_PROT_DB_NAME]
                [--nucl_db_name NUCL_DB_NAME] [--prot_db_name PROT_DB_NAME]
-               [--db_dir DB_DIR]
+               [--db_dir DB_DIR] [--deepac_model DEEPAC_MODEL]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -149,6 +150,8 @@ General:
                         	cluster: Fasta file clusterization using vsearch
                         	virus_search: Search for virus sequences, always performed
                         	additional_search: Search for sequences that were not identified at virus_search step
+                        
+                        un_nn_test: Run Deepac-vir (doi.org/10.1093/nargab/lqab004) and ViraMiner (doi:10.1371/journal.pone.0222271) prediction for unidentified sequences
                         	all: Perform all steps
   --output_dir OUTPUT_DIR
                         Path to output folder, default: "/output/" for docker image
@@ -157,7 +160,8 @@ General:
   --keep_temp           Keep temporary files in output folder, default: false
 
 Merging (fastp):
-  --save_unmerged       Save unmerged reads for processing, default disabled
+  --do_not_save_unmerged
+                        Do not save unmerged reads for processing, default: disabled
 
 Quality control (fastp):
   --adapters ADAPTERS   Path to the file with the adapter sequences for fastp, default: /input/adapters.fa for docker image
@@ -194,6 +198,8 @@ Search:
                         Megablast evalue threshold for additional search stage, default = 1e-10
   --additional_search_evalue_p ADDITIONAL_SEARCH_EVALUE_P
                         Diamond evalue threshold for additional search stage, default = 1e-10
+  --max_target_seqs MAX_TARGET_SEQS
+                         Number of database sequences to show alignments for blastn and diamond, default = 25
   --virus_nucl_db_name VIRUS_NUCL_DB_NAME
                         Nucleotide database with virus sequences, default: virus_nucl
   --virus_prot_db_name VIRUS_PROT_DB_NAME
@@ -203,6 +209,10 @@ Search:
   --prot_db_name PROT_DB_NAME
                         Protein database with various sequences for search, default: nr_diamond
   --db_dir DB_DIR       Full path to database folder, default: "/database/" for docker image
+
+DeePaC-vir and ViraMiner tests:
+  --deepac_model DEEPAC_MODEL
+                        DeePaC-vir model: CNN or LSTM, default = LSTM
 
   ```
   
